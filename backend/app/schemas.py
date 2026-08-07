@@ -119,3 +119,65 @@ class CompanySettingResponse(BaseModel):
 
 class UserStatusUpdate(BaseModel):
     is_active: bool
+class InterviewSessionResponse(BaseModel):
+    id: int
+    candidate_id: int
+    analysis_id: int
+    title: str
+    status: str
+    total_questions: int
+    answered_questions: int
+    average_score: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class InterviewAnswerSubmit(BaseModel):
+    question: str = Field(min_length=5)
+    answer: str = Field(min_length=10)
+
+
+class InterviewAnswerResponse(BaseModel):
+    id: int
+    session_id: int
+    question: str
+    answer: str
+    score: int
+
+    technical_score: int
+    communication_score: int
+    confidence_score: int
+
+    feedback: str | None
+    improvement_tip: str | None
+    strengths: str | None
+    weaknesses: str | None
+
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class InterviewSessionDetailResponse(BaseModel):
+    session: InterviewSessionResponse
+    questions: list[str]
+    answers: list[InterviewAnswerResponse]
+
+
+class InterviewResultResponse(BaseModel):
+    session_id: int
+    title: str
+    status: str
+    total_questions: int
+    answered_questions: int
+    average_score: int
+
+    average_technical_score: int
+    average_communication_score: int
+    average_confidence_score: int
+
+    overall_feedback: str
+    final_recommendation: str
+
+    answers: list[InterviewAnswerResponse]

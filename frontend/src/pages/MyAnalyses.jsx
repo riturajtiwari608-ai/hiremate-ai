@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import api from "../api/api";
 
 function MyAnalyses() {
   const [analyses, setAnalyses] = useState([]);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const fetchAnalyses = async () => {
     try {
@@ -51,6 +53,14 @@ function MyAnalyses() {
       alert("Delete failed");
     }
   };
+  const startInterview = async (analysisId) => {
+  try {
+    const response = await api.post(`/interviews/start/${analysisId}`);
+    navigate(`/candidate/interviews/${response.data.id}`);
+  } catch (err) {
+    alert(err.response?.data?.detail || "Failed to start interview");
+  }
+};
 
   return (
     <>
@@ -88,6 +98,10 @@ function MyAnalyses() {
               <p>
                 <strong>Suggestions:</strong> {item.suggestions}
               </p>
+              <details>
+                <summary>View Preparation Roadmap</summary>
+                <pre>{item.preparation_roadmap}</pre>
+              </details>
 
               <details>
                 <summary>View Interview Questions</summary>
@@ -95,6 +109,12 @@ function MyAnalyses() {
               </details>
 
               <div className="button-row">
+                <button
+                  className="primary-btn"
+                  onClick={() => startInterview(item.id)}
+                >
+                  Start Mock Interview
+                </button>
                 <button
                   className="secondary-btn"
                   onClick={() => downloadReport(item.id)}

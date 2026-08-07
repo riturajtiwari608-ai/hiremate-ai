@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 
@@ -11,6 +11,18 @@ function Register() {
     password: "",
     role: "candidate",
   });
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (token && role === "admin") {
+    navigate("/admin/dashboard");
+  }
+
+  if (token && role === "candidate") {
+    navigate("/candidate/dashboard");
+  }
+}, [navigate]);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");

@@ -2,14 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
-from app.routers import auth_routes, user_routes, analysis_routes, branding_routes
+from app.routers import auth_routes, user_routes, analysis_routes, branding_routes,  interview_routes
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="HireMate AI Backend",
     description="AI-powered hiring readiness platform backend",
-    version="2.1.0",
+    version="3.2.0",
 )
 
 
@@ -36,3 +36,4 @@ app.include_router(auth_routes.router)
 app.include_router(user_routes.router)
 app.include_router(analysis_routes.router)
 app.include_router(branding_routes.router)
+app.include_router(interview_routes.router)

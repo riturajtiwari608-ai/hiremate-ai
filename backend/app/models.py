@@ -44,6 +44,51 @@ class Analysis(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     candidate = relationship("User", back_populates="analyses")
+class InterviewSession(Base):
+    __tablename__ = "interview_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    candidate_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    analysis_id = Column(Integer, ForeignKey("analyses.id"), nullable=False)
+
+    title = Column(String, nullable=False)
+    status = Column(String, default="in_progress")  # in_progress/completed
+
+    total_questions = Column(Integer, default=0)
+    answered_questions = Column(Integer, default=0)
+    average_score = Column(Integer, default=0)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    candidate = relationship("User")
+    analysis = relationship("Analysis")
+    answers = relationship("InterviewAnswer", back_populates="session")
+
+
+class InterviewAnswer(Base):
+    __tablename__ = "interview_answers"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    session_id = Column(Integer, ForeignKey("interview_sessions.id"), nullable=False)
+
+    question = Column(Text, nullable=False)
+    answer = Column(Text, nullable=False)
+
+    score = Column(Integer, default=0)
+    technical_score = Column(Integer, default=0)
+    communication_score = Column(Integer, default=0)
+    confidence_score = Column(Integer, default=0)
+
+    feedback = Column(Text, nullable=True)
+    improvement_tip = Column(Text, nullable=True)
+    strengths = Column(Text, nullable=True)
+    weaknesses = Column(Text, nullable=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    session = relationship("InterviewSession", back_populates="answers")
 
 class CompanySetting(Base):
     __tablename__ = "company_settings"

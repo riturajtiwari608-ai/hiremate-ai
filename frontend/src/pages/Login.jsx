@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
 
@@ -8,6 +8,19 @@ function Login() {
   const [email, setEmail] = useState("rituraj@example.com");
   const [password, setPassword] = useState("123456");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (token && role === "admin") {
+    navigate("/admin/dashboard");
+  }
+
+  if (token && role === "candidate") {
+    navigate("/candidate/dashboard");
+  }
+}, [navigate]);
 
   const fetchProfileAndRedirect = async () => {
     const response = await api.get("/users/me");

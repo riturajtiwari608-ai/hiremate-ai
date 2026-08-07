@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import api from "../api/api";
+import BrandingForm from "../components/BrandingForm";
+import { Link } from "react-router-dom";
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -42,6 +44,18 @@ function AdminDashboard() {
       alert("PDF download failed");
     }
   };
+  const deleteAnalysis = async (analysisId) => {
+    const confirmDelete = window.confirm("Delete this candidate analysis?");
+
+    if (!confirmDelete) return;
+
+    try {
+        await api.delete(`/analyses/${analysisId}`);
+        fetchAdminData();
+    } catch (err) {
+        alert("Delete failed");
+    }
+};
 
   return (
     <>
@@ -49,6 +63,12 @@ function AdminDashboard() {
 
       <main className="container">
         <h1>Admin Dashboard</h1>
+        <div className="button-row">
+          <Link className="primary-link-btn dark-btn" to="/admin/users">
+              Manage Users
+          </Link>
+        </div>
+        <BrandingForm />
 
         {error && <div className="error-box">{error}</div>}
 
@@ -111,12 +131,21 @@ function AdminDashboard() {
               <p>
                 <strong>Missing:</strong> {item.missing_skills}
               </p>
-
+              <details>
+                <summary>View Preparation Roadmap</summary>
+                <pre>{item.preparation_roadmap}</pre>
+              </details>
               <button
                 className="secondary-btn"
                 onClick={() => downloadReport(item.id)}
               >
                 Download PDF Report
+              </button>
+              <button
+                className="danger-btn"
+                onClick={() => deleteAnalysis(item.id)}
+              >
+                Delete
               </button>
             </div>
           ))}
