@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api";
+import { clearAuth, hasValidSession } from "../api/auth";
 
 function Login() {
   const navigate = useNavigate();
@@ -12,6 +13,11 @@ function Login() {
   useEffect(() => {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
+
+  if (!hasValidSession()) {
+    clearAuth();
+    return;
+  }
 
   if (token && role === "admin") {
     navigate("/admin/dashboard");

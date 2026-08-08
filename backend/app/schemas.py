@@ -181,3 +181,25 @@ class InterviewResultResponse(BaseModel):
     final_recommendation: str
 
     answers: list[InterviewAnswerResponse]
+
+class DashboardAnalyticsResponse(BaseModel):
+
+    overall_score: int
+
+    average_technical_score: int
+
+    average_communication_score: int
+
+    average_confidence_score: int
+
+    total_interviews: int
+
+    completed_interviews: int
+
+    interview_history: list
+
+    strengths: list[str]
+
+    weaknesses: list[str]
+
+    recommendations: list[str]

@@ -1,3 +1,7 @@
+from fastapi.responses import StreamingResponse
+from io import BytesIO
+
+from app.services.pdf_service import generate_interview_pdf
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -395,3 +399,81 @@ def get_interview_result(
     "final_recommendation": final_recommendation,
     "answers": answers
 }
+@router.get("/{session_id}/report")
+def download_interview_report(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    session = (
+        db.query(InterviewSession)
+        .filter(InterviewSession.id == session_id)
+        .first()
+    )
+
+    if not session:
+        raise HTTPException(
+            status_code=404,
+            detail="Interview session not found",
+        )
+
+    if (
+        current_user.role != "admin"
+        and session.candidate_id != current_user.id
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="Not allowed",
+        )
+
+    answers = (
+        db.query(InterviewAnswer)
+        .filter(InterviewAnswer.session_id == session.id)
+        .all()
+    )
+
+    if answers:
+        avg_technical = int(
+            sum(a.technical_score for a in answers) / len(answers)
+        )
+
+        avg_communication = int(
+            sum(a.communication_score for a in answers) / len(answers)
+        )
+
+        avg_confidence = int(
+            sum(a.confidence_score for a in answers) / len(answers)
+        )
+    else:
+        avg_technical = 0
+        avg_communication = 0
+        avg_confidence = 0
+
+    result = {
+        "title": session.title,
+        "average_score": session.average_score,
+        "average_technical_score": avg_technical,
+        "average_communication_score": avg_communication,
+        "average_confidence_score": avg_confidence,
+        "overall_feedback": (
+            "AI generated interview performance report."
+        ),
+        "final_recommendation": (
+            "Keep practicing consistently to improve interview performance."
+        ),
+        "answers": answers,
+    }
+
+    pdf = generate_interview_pdf(
+        result=result,
+        user=current_user,
+    )
+
+    return StreamingResponse(
+        BytesIO(pdf),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition":
+            f'attachment; filename="Interview_Report_{session.id}.pdf"'
+        },
+    )

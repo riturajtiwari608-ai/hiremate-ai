@@ -1,10 +1,12 @@
 import { Navigate } from "react-router-dom";
+import { clearAuth, hasValidSession } from "../api/auth";
 
 function ProtectedRoute({ children, allowedRole }) {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
-  if (!token) {
+  if (!token || !hasValidSession()) {
+    clearAuth();
     return <Navigate to="/login" replace />;
   }
 

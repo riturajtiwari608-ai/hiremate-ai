@@ -279,8 +279,22 @@ textarea:focus {
   }
 
   .nav-links {
+    width: 100%;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 10px;
+  }
+
+  .nav-links a {
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .user-pill {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .grid-3,

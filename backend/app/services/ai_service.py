@@ -186,3 +186,83 @@ def evaluate_answer_with_gemini(question: str, answer: str, job_title: str):
     except Exception as error:
         print("Gemini answer evaluation failed:", error)
         return None
+
+def analyze_dashboard_with_gemini(interview_answers: list[str]):
+    if not settings.USE_GEMINI:
+        return None
+
+    if not settings.GEMINI_API_KEY:
+        return None
+
+    try:
+        import google.generativeai as genai
+
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+
+        model = genai.GenerativeModel("gemini-1.5-flash")
+
+        prompt = build_dashboard_analysis_prompt(interview_answers=interview_answers)
+
+        response = model.generate_content(prompt)
+
+        if not response or not response.text:
+            return None
+
+        cleaned_text = clean_json_response(response.text)
+
+        parsed = json.loads(cleaned_text)
+
+        return {
+            "strengths": str(parsed.get("strengths", "")),
+            "weaknesses": str(parsed.get("weaknesses", "")),
+            "recommendations": str(parsed.get("recommendations", "")),
+}
+
+    except Exception as error:
+        print("Gemini dashboard analysis failed:", error)
+        return None
+def build_dashboard_analysis_prompt(interview_answers: list[str]):
+    joined_answers = "\n\n".join(interview_answers)
+
+    return f"""
+You are an experienced Senior Software Engineering Interviewer.
+
+Analyze the following interview answers.
+
+Return ONLY valid JSON.
+
+JSON format:
+
+{{
+    "strengths":[
+        "...",
+        "...",
+        "..."
+    ],
+
+    "weaknesses":[
+        "...",
+        "...",
+        "..."
+    ],
+
+    "recommendations":[
+        "...",
+        "...",
+        "..."
+    ]
+}}
+
+Rules
+
+- Maximum 5 strengths.
+- Maximum 5 weaknesses.
+- Maximum 5 recommendations.
+- Recommendations should be actionable.
+- No markdown.
+- No explanation.
+
+Candidate Answers:
+
+{joined_answers}
+"""

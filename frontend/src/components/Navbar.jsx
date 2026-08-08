@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getBranding } from "../api/branding";
+import { clearAuth } from "../api/auth";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ function Navbar() {
           "--primary-color",
           data.primary_color || "#2563eb"
         );
-      } catch (error) {
+      } catch {
         console.log("Branding load failed");
       }
     };
@@ -31,9 +32,7 @@ function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("full_name");
+    clearAuth();
     navigate("/login");
   };
 
