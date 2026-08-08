@@ -18,10 +18,16 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
+engine_options = {}
+
+# SQLite needs this flag for FastAPI's threaded request handling. PostgreSQL
+# rejects it as an invalid connection option, so only pass it for SQLite URLs.
+if settings.DATABASE_URL.startswith("sqlite"):
+    engine_options["connect_args"] = {"check_same_thread": False}
+else:
+    engine_options["pool_pre_ping"] = True
+
+engine = create_engine(settings.DATABASE_URL, **engine_options)
 
 SessionLocal = sessionmaker(
     autocommit=False,
