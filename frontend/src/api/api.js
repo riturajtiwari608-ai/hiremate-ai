@@ -1,7 +1,8 @@
 import axios from "axios";
 import { clearAuth } from "./auth";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://hiremate-ai-m2ej.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
