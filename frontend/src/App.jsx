@@ -11,6 +11,7 @@ import UserManagement from "./pages/UserManagement";
 import MyInterviews from "./pages/MyInterviews";
 import InterviewRoom from "./pages/InterviewRoom";
 import InterviewResult from "./pages/InterviewResult";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 
 function App() {
   return (
@@ -69,6 +70,15 @@ function App() {
         element={
           <ProtectedRoute allowedRole="candidate">
             <InterviewResult />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/candidate/analytics"
+        element={
+          <ProtectedRoute allowedRole="candidate">
+            <AnalyticsDashboard />
           </ProtectedRoute>
         }
       />
