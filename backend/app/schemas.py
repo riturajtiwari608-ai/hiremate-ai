@@ -45,6 +45,22 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    new_password: str = Field(min_length=6, max_length=72)
+    reset_code: str | None = None
+
+    @field_validator("new_password", mode="before")
+    @classmethod
+    def allow_string_or_int_password(cls, value):
+        return normalize_password(value)
+
+
 class AnalysisCreate(BaseModel):
     job_title: str = Field(min_length=2, max_length=150)
     company_name: str | None = None

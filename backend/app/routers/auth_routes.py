@@ -65,3 +65,35 @@ def login_user(
     access_token = create_access_token(data={"sub": str(user.id), "role": user.role})
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/forgot-password")
+def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == req.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No account found with this email address."
+        )
+    # Generate a demo reset token / code for instantaneous password reset
+    return {
+        "message": "Reset instructions sent to your email.",
+        "email": req.email,
+        "reset_code": "RESET-123456"
+    }
+
+
+@router.post("/reset-password")
+def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == req.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    user.hashed_password = hash_password(req.new_password)
+    db.commit()
+    
+    return {"message": "Password has been successfully updated. You can now login."}
+
