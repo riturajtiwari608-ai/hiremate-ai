@@ -203,3 +203,17 @@ class DashboardAnalyticsResponse(BaseModel):
     weaknesses: list[str]
 
     recommendations: list[str]
+
+
+class ResumeOptimizationResponse(BaseModel):
+    analysis_id: int
+    job_title: str
+    ats_score: int
+    tailored_summary: str
+    optimized_bullets: list[str]
+    added_keywords: list[str]
+    full_optimized_resume: str
+
+
+class EmailReportRequest(BaseModel):
+    recipient_email: EmailStr | None = None
